@@ -160,6 +160,8 @@ function renderHome(){const d=today(),aps=db.appointments.filter(a=>a.date===d),
 function clearPatient(){['p_id','p_name','p_phone','p_file','p_age','p_address','p_medical','p_allergies','p_notes'].forEach(x=>$(x).value='');$('p_gender').value=''}
 function savePatient(){
  const name=$('p_name').value.trim();if(!name)return alert('اكتب اسم المريض');
+ const rawFile=$('p_file').value.trim();if(rawFile&&!/^\\d+$/.test(rawFile))return alert('رقم الملف يجب أن يحتوي على أرقام فقط');
+ const currentId=$('p_id').value;if(rawFile&&db.patients.some(p=>p.file===rawFile&&p.id!==currentId))return alert('رقم الملف مستخدم بالفعل لمريض آخر');
  const nextFile=String(Math.max(1000,...db.patients.map(p=>Number(p.file)||0))+1);
  const obj={id:$('p_id').value||id(),name,phone:$('p_phone').value.trim(),file:$('p_file').value.trim()||nextFile,age:$('p_age').value,gender:$('p_gender').value,address:$('p_address').value,medical:$('p_medical').value,allergies:$('p_allergies').value,notes:$('p_notes').value,created_at:db.patients.find(p=>p.id===$('p_id').value)?.created_at||new Date().toISOString(),updated_at:new Date().toISOString()};
  const i=db.patients.findIndex(p=>p.id===obj.id);if(i>=0)db.patients[i]=obj;else db.patients.push(obj);clearPatient();persist()
