@@ -62,7 +62,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}.balance-good{color:#08
 </section>
 <section id="payments" class="tab hidden">
 <div class="panel"><h2>تسجيل دفعة</h2><div class="grid"><div class="field"><label>المريض *</label><select id="pay_patient"></select></div><div class="field"><label>التاريخ</label><input id="pay_date" type="date"></div><div class="field"><label>المبلغ (جنيه)</label><input id="pay_amount" type="number" min="0" step="0.01"></div><div class="field"><label>نوع العملية</label><select id="pay_type"><option>دفعة</option><option>استرداد</option></select></div><div class="field"><label>طريقة الدفع</label><select id="pay_method"><option>نقدي</option><option>بطاقة</option><option>تحويل بنكي</option><option>محفظة إلكترونية</option></select></div></div><div class="field"><label>البيان</label><input id="pay_note" placeholder="كشف، حشو، تقويم..."></div><button class="btn primary" onclick="savePayment()">حفظ وطباعة إيصال</button></div>
-<div class="panel"><h2>سجل المدفوعات</h2><div class="tablewrap"><table><thead><tr><th>رقم الإيصال</th><th>التاريخ</th><th>المريض</th><th>البيان</th><th>المبلغ</th><th>إجراء</th></tr></thead><tbody id="paymentsRows"></tbody></table></div></div>
+<div class="panel"><h2>سجل المدفوعات</h2><div class="tablewrap"><table><thead><tr><th>رقم الإيصال</th><th>التاريخ</th><th>المريض</th><th>البيان</th><th>نوع العملية</th><th>المبلغ</th><th>المتبقي</th><th>إجراء</th></tr></thead><tbody id="paymentsRows"></tbody></table></div></div>
 </section>
 <section id="treatments" class="tab hidden">
 <div class="panel"><h2>إضافة إلى سجل العلاج السنوي</h2><div class="grid"><div class="field"><label>المريض *</label><select id="t_patient"></select></div><div class="field"><label>تاريخ العلاج</label><input id="t_date" type="date"></div><div class="field"><label>نوع العلاج</label><input id="t_type" placeholder="حشو، علاج جذور، تنظيف، تقويم..."></div><div class="field"><label>رقم السن</label><input id="t_tooth" placeholder="مثال: 16"></div><div class="field"><label>تكلفة العلاج (جنيه)</label><input id="t_cost" type="number" min="0" step="0.01" placeholder="0.00"></div></div><div class="field"><label>تفاصيل وملاحظات العلاج</label><textarea id="t_notes"></textarea></div><button class="btn primary" onclick="saveTreatment()">حفظ العلاج</button></div>
@@ -101,7 +101,7 @@ function patientBalance(pid){return patientTotal(pid)-patientPaid(pid)}
 function paymentTypeFromNotes(s){const m=String(s||'').match(/^\[\[TYPE=(دفعة|استرداد)\]\]\s*/);return {type:m?m[1]:'دفعة',note:String(s||'').replace(/^\[\[TYPE=(دفعة|استرداد)\]\]\s*/,'')}}
 function setNotice(s){const el=$('syncStatus');if(el)el.textContent=s}
 function serialRows(t){
- if(t==='patients')return db.patients.map(p=>({id:p.id,file_number:p.file?Number(p.file):null,full_name:p.name,phone:p.phone||null,age:p.age===''||p.age==null?null:Number(p.age),gender:p.gender||null,address:p.address||null,medical_history:p.medical||null,allergies:p.allergies||null,notes:p.notes||null,created_at:p.created_at||new Date().toISOString(),updated_at:new Date().toISOString()}));
+ if(t==='patients')return db.patients.map(p=>({id:p.id,file_number:p.file?Number(p.file):null,full_name:p.name,phone:p.phone||null,age:p.age===''||p.age==null?null:Number(p.age),gender:p.gender||null,address:p.address||null,medical_history:p.medical||null,allergies:p.allergies||null,notes:p.notes||null,created_at:p.created_at||new Date().toISOString(),updated_at:p.updated_at||p.created_at||new Date().toISOString()}));
  if(t==='appointments')return db.appointments.map(a=>({id:a.id,patient_id:a.patient,scheduled_at:localIso(a.date,a.time),status:a.status||'مجدول',reason:a.reason||null,notes:a.notes||null,created_at:a.created_at||new Date().toISOString()}));
  if(t==='visits')return db.visits.map(v=>({id:v.id,patient_id:v.patient,visit_date:localIso(v.date,'12:00'),chief_complaint:v.chief||null,diagnosis:v.diagnosis||null,examination:v.examination||null,treatment_plan:v.plan||null,notes:v.notes||null,next_visit:v.next_visit||null,created_at:v.created_at||new Date().toISOString()}));
  if(t==='treatments')return db.treatments.map(t=>({id:t.id,visit_id:t.visit,cost:Number(t.cost||0),treatment_name:t.type,tooth_number:t.tooth||null,description:t.notes||null,created_at:t.created_at||new Date().toISOString()}));
@@ -115,7 +115,7 @@ async function loadAll(){
   const raw={};for(const t of TABLES)raw[t]=await fetchTable(t);
   if(v!==ver)return;
   db=EMPTY();
-  db.patients=raw.patients.map(p=>({id:p.id,name:p.full_name||'',phone:p.phone||'',file:p.file_number==null?'':String(p.file_number),age:p.age==null?'':p.age,gender:p.gender||'',address:p.address||'',medical:p.medical_history||'',allergies:p.allergies||'',notes:p.notes||'',created_at:p.created_at}));
+  db.patients=raw.patients.map(p=>({id:p.id,name:p.full_name||'',phone:p.phone||'',file:p.file_number==null?'':String(p.file_number),age:p.age==null?'':p.age,gender:p.gender||'',address:p.address||'',medical:p.medical_history||'',allergies:p.allergies||'',notes:p.notes||'',created_at:p.created_at,updated_at:p.updated_at}));
   db.appointments=raw.appointments.map(a=>({id:a.id,patient:a.patient_id,date:localDate(a.scheduled_at),time:localTime(a.scheduled_at),status:a.status||'مجدول',reason:a.reason||'',notes:a.notes||'',created_at:a.created_at}));
   db.visits=raw.visits.map(x=>({id:x.id,patient:x.patient_id,date:localDate(x.visit_date),chief:x.chief_complaint||'',diagnosis:x.diagnosis||'',examination:x.examination||'',plan:x.treatment_plan||'',notes:x.notes||'',next_visit:x.next_visit||'',created_at:x.created_at}));
   const vm=new Map(db.visits.map(x=>[x.id,x]));
@@ -161,7 +161,7 @@ function clearPatient(){['p_id','p_name','p_phone','p_file','p_age','p_address',
 function savePatient(){
  const name=$('p_name').value.trim();if(!name)return alert('اكتب اسم المريض');
  const nextFile=String(Math.max(1000,...db.patients.map(p=>Number(p.file)||0))+1);
- const obj={id:$('p_id').value||id(),name,phone:$('p_phone').value.trim(),file:$('p_file').value.trim()||nextFile,age:$('p_age').value,gender:$('p_gender').value,address:$('p_address').value,medical:$('p_medical').value,allergies:$('p_allergies').value,notes:$('p_notes').value,created_at:db.patients.find(p=>p.id===$('p_id').value)?.created_at||new Date().toISOString()};
+ const obj={id:$('p_id').value||id(),name,phone:$('p_phone').value.trim(),file:$('p_file').value.trim()||nextFile,age:$('p_age').value,gender:$('p_gender').value,address:$('p_address').value,medical:$('p_medical').value,allergies:$('p_allergies').value,notes:$('p_notes').value,created_at:db.patients.find(p=>p.id===$('p_id').value)?.created_at||new Date().toISOString(),updated_at:new Date().toISOString()};
  const i=db.patients.findIndex(p=>p.id===obj.id);if(i>=0)db.patients[i]=obj;else db.patients.push(obj);clearPatient();persist()
 }
 function renderPatients(){
@@ -215,7 +215,7 @@ function del(table,pid){
  persist()
 }
 function exportData(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Fayed-Dental-Clinic-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url)}
-function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.patients||!x.appointments||!x.payments||!x.treatments)throw 0;if(!confirm('سيتم استبدال البيانات الحالية. هل تريد المتابعة؟'))return;db={patients:x.patients,appointments:x.appointments,visits:x.visits||[],payments:x.payments,treatments:x.treatments};persist();alert('تم بدء استعادة البيانات إلى السحابة')}catch(err){alert('ملف النسخة الاحتياطية غير صالح')}};r.readAsText(f)}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.patients||!x.appointments||!x.payments||!x.treatments)throw 0;if(!confirm('سيتم استبدال البيانات الحالية. هل تريد المتابعة؟'))return;db={patients:x.patients.map(p=>({...p,age:p.age??''})),appointments:x.appointments,visits:x.visits||[],payments:x.payments,treatments:x.treatments.map(t=>{if(t.visit)return t;const visit=id();db.visits.push({id:visit,patient:t.patient,date:t.date||today(),plan:t.type||'',notes:t.notes||'',created_at:new Date().toISOString()});return {...t,visit,cost:Number(t.cost||0)}})};persist();alert('تم بدء استعادة البيانات إلى السحابة')}catch(err){alert('ملف النسخة الاحتياطية غير صالح')}};r.readAsText(f)}
 function clearAll(){if(prompt('تحذير: سيتم حذف جميع بيانات المرضى والمواعيد والمدفوعات والعلاجات نهائيًا من السحابة ومن كل الأجهزة.\nللتأكيد اكتب كلمة: حذف')==='حذف'){db=EMPTY();persist()}}
 ['a_date','pay_date','t_date','reportDate','appointmentDate'].forEach(x=>{if($(x))$(x).value=today()});
 refresh();
