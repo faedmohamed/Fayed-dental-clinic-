@@ -23,7 +23,7 @@ label{font-size:13px;color:var(--muted);display:block;margin:0 0 5px}
 input,select,textarea{width:100%;border:1px solid #cad9d6;border-radius:9px;padding:11px;background:white;color:var(--ink);font:inherit;min-width:0}
 textarea{min-height:75px;resize:vertical}.field{margin-bottom:10px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f4f8f7;color:#42605d}
+table{width:100%;border-collapse:collapse;font-size:13px}.balance-good{color:#087f83;font-weight:bold}.balance-due{color:#b42318;font-weight:bold}th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f4f8f7;color:#42605d}
 .tablewrap{overflow:auto}.muted{color:var(--muted);font-size:12px}.hidden{display:none!important}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .notice{background:#fff8e6;border:1px solid #f2dfaa;border-radius:10px;padding:11px;font-size:12px;line-height:1.7;margin-bottom:12px}
 .empty{text-align:center;color:var(--muted);padding:22px}
@@ -53,21 +53,20 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:right;
 <div class="panel"><h2>اختصارات</h2><div class="actions no-print"><button class="btn primary" onclick="showTab('patients')">إضافة مريض</button><button class="btn" onclick="showTab('appointments')">تسجيل موعد</button><button class="btn" onclick="showTab('payments')">تسجيل دفعة</button><button class="btn" onclick="showTab('treatments')">إضافة علاج</button></div></div>
 </section>
 <section id="patients" class="tab hidden">
-<div class="panel"><h2>إضافة / تعديل مريض</h2><input type="hidden" id="p_id">
-<div class="grid"><div class="field"><label>اسم المريض *</label><input id="p_name" placeholder="الاسم بالكامل"></div><div class="field"><label>رقم الهاتف</label><input id="p_phone" inputmode="tel"></div><div class="field"><label>رقم الملف</label><input id="p_file" placeholder="يُنشأ تلقائيًا إذا تُرك فارغًا"></div><div class="field"><label>تاريخ الميلاد</label><input id="p_birth" type="date"></div></div><div class="field"><label>ملاحظات</label><textarea id="p_notes"></textarea></div><div class="actions"><button class="btn primary" onclick="savePatient()">حفظ المريض</button><button class="btn light" onclick="clearPatient()">تفريغ الحقول</button></div></div>
-<div class="panel"><div class="row"><h2>قائمة المرضى</h2><input id="patientSearch" style="max-width:280px" placeholder="ابحث بالاسم أو الهاتف أو رقم الملف" oninput="renderPatients()"></div><div class="tablewrap"><table><thead><tr><th>رقم الملف</th><th>اسم المريض</th><th>الهاتف</th><th>إجراءات</th></tr></thead><tbody id="patientsRows"></tbody></table></div></div>
+<div class="panel"><h2>إضافة / تعديل مريض</h2><input type="hidden" id="p_id"><div class="grid"><div class="field"><label>اسم المريض *</label><input id="p_name" placeholder="الاسم بالكامل"></div><div class="field"><label>رقم الهاتف</label><input id="p_phone" inputmode="tel"></div><div class="field"><label>رقم الملف</label><input id="p_file" placeholder="يُنشأ تلقائيًا إذا تُرك فارغًا"></div><div class="field"><label>العمر</label><input id="p_age" type="number" min="0" max="120"></div><div class="field"><label>النوع</label><select id="p_gender"><option value="">غير محدد</option><option>ذكر</option><option>أنثى</option></select></div><div class="field"><label>العنوان</label><input id="p_address"></div></div><div class="grid"><div class="field"><label>التاريخ المرضي</label><textarea id="p_medical"></textarea></div><div class="field"><label>الحساسية</label><textarea id="p_allergies"></textarea></div></div><div class="field"><label>ملاحظات</label><textarea id="p_notes"></textarea></div><div class="actions"><button class="btn primary" onclick="savePatient()">حفظ المريض</button><button class="btn light" onclick="clearPatient()">تفريغ الحقول</button></div></div>
+<div class="panel"><div class="row"><h2>قائمة المرضى وحساباتهم</h2><input id="patientSearch" style="max-width:280px" placeholder="ابحث بالاسم أو الهاتف أو رقم الملف" oninput="renderPatients()"></div><div class="tablewrap"><table><thead><tr><th>رقم الملف</th><th>اسم المريض</th><th>الهاتف</th><th>إجمالي العلاج</th><th>المدفوع</th><th>المتبقي</th><th>إجراءات</th></tr></thead><tbody id="patientsRows"></tbody></table></div></div>
 </section>
 <section id="appointments" class="tab hidden">
 <div class="panel"><h2>تسجيل موعد / حضور</h2><input type="hidden" id="a_id"><div class="grid"><div class="field"><label>المريض *</label><select id="a_patient"></select></div><div class="field"><label>التاريخ</label><input id="a_date" type="date"></div><div class="field"><label>الوقت</label><input id="a_time" type="time"></div><div class="field"><label>الحالة</label><select id="a_status"><option value="مجدول">مجدول</option><option value="حضر">حضر</option><option value="متأخر">متأخر</option><option value="لم يحضر">لم يحضر</option><option value="تم">تم</option><option value="ملغي">ملغي</option></select></div></div><div class="field"><label>سبب الزيارة / ملاحظات</label><textarea id="a_reason"></textarea></div><div class="actions"><button class="btn primary" onclick="saveAppointment()">حفظ الموعد</button><button class="btn light" onclick="clearAppointment()">تفريغ</button></div></div>
 <div class="panel"><div class="row"><h2>جدول المواعيد</h2><input id="appointmentDate" type="date" style="max-width:180px" onchange="renderAppointments()"></div><div class="tablewrap"><table><thead><tr><th>الوقت</th><th>المريض</th><th>الحالة</th><th>السبب</th><th>إجراءات</th></tr></thead><tbody id="appointmentsRows"></tbody></table></div></div>
 </section>
 <section id="payments" class="tab hidden">
-<div class="panel"><h2>تسجيل دفعة</h2><div class="grid"><div class="field"><label>المريض *</label><select id="pay_patient"></select></div><div class="field"><label>التاريخ</label><input id="pay_date" type="date"></div><div class="field"><label>المبلغ المدفوع (جنيه)</label><input id="pay_amount" type="number" min="0" step="0.01"></div><div class="field"><label>نوع العملية</label><select id="pay_type"><option>دفعة</option><option>استرداد</option></select></div></div><div class="field"><label>البيان</label><input id="pay_note" placeholder="كشف، حشو، تقويم..."></div><button class="btn primary" onclick="savePayment()">حفظ وطباعة إيصال</button></div>
+<div class="panel"><h2>تسجيل دفعة</h2><div class="grid"><div class="field"><label>المريض *</label><select id="pay_patient"></select></div><div class="field"><label>التاريخ</label><input id="pay_date" type="date"></div><div class="field"><label>المبلغ (جنيه)</label><input id="pay_amount" type="number" min="0" step="0.01"></div><div class="field"><label>نوع العملية</label><select id="pay_type"><option>دفعة</option><option>استرداد</option></select></div><div class="field"><label>طريقة الدفع</label><select id="pay_method"><option>نقدي</option><option>بطاقة</option><option>تحويل بنكي</option><option>محفظة إلكترونية</option></select></div></div><div class="field"><label>البيان</label><input id="pay_note" placeholder="كشف، حشو، تقويم..."></div><button class="btn primary" onclick="savePayment()">حفظ وطباعة إيصال</button></div>
 <div class="panel"><h2>سجل المدفوعات</h2><div class="tablewrap"><table><thead><tr><th>رقم الإيصال</th><th>التاريخ</th><th>المريض</th><th>البيان</th><th>المبلغ</th><th>إجراء</th></tr></thead><tbody id="paymentsRows"></tbody></table></div></div>
 </section>
 <section id="treatments" class="tab hidden">
-<div class="panel"><h2>إضافة إلى سجل العلاج السنوي</h2><div class="grid"><div class="field"><label>المريض *</label><select id="t_patient"></select></div><div class="field"><label>تاريخ العلاج</label><input id="t_date" type="date"></div><div class="field"><label>نوع العلاج</label><input id="t_type" placeholder="حشو، علاج جذور، تنظيف، تقويم..."></div><div class="field"><label>رقم السن</label><input id="t_tooth" placeholder="مثال: 16"></div></div><div class="field"><label>تفاصيل وملاحظات العلاج</label><textarea id="t_notes"></textarea></div><button class="btn primary" onclick="saveTreatment()">حفظ العلاج</button></div>
-<div class="panel"><h2>السجل العلاجي</h2><div class="row"><select id="t_filter" style="max-width:280px" onchange="renderTreatments()"></select><select id="t_year" style="max-width:150px" onchange="renderTreatments()"></select></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المريض</th><th>العلاج</th><th>السن</th><th>التفاصيل</th><th></th></tr></thead><tbody id="treatmentsRows"></tbody></table></div></div>
+<div class="panel"><h2>إضافة إلى سجل العلاج السنوي</h2><div class="grid"><div class="field"><label>المريض *</label><select id="t_patient"></select></div><div class="field"><label>تاريخ العلاج</label><input id="t_date" type="date"></div><div class="field"><label>نوع العلاج</label><input id="t_type" placeholder="حشو، علاج جذور، تنظيف، تقويم..."></div><div class="field"><label>رقم السن</label><input id="t_tooth" placeholder="مثال: 16"></div><div class="field"><label>تكلفة العلاج (جنيه)</label><input id="t_cost" type="number" min="0" step="0.01" placeholder="0.00"></div></div><div class="field"><label>تفاصيل وملاحظات العلاج</label><textarea id="t_notes"></textarea></div><button class="btn primary" onclick="saveTreatment()">حفظ العلاج</button></div>
+<div class="panel"><h2>السجل العلاجي</h2><div class="row"><select id="t_filter" style="max-width:280px" onchange="renderTreatments()"></select><select id="t_year" style="max-width:150px" onchange="renderTreatments()"></select></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المريض</th><th>العلاج</th><th>السن</th><th>التكلفة</th><th>التفاصيل</th><th></th></tr></thead><tbody id="treatmentsRows"></tbody></table></div></div>
 </section>
 <section id="reports" class="tab hidden">
 <div class="panel"><h2>الإحصائيات اليومية والأسبوعية</h2><div class="row"><label>تاريخ التقرير</label><input id="reportDate" type="date" style="max-width:190px" onchange="renderReports()"></div><div class="stats" id="reportStats"></div><h2 style="margin-top:20px">المواعيد حسب الساعة — اليوم المحدد</h2><div id="hourReport"></div><p class="muted">يُحسب الحضور من الحالات المسجلة «حضر» أو «تم». متوسط الانتظار لا يُحسب في هذه النسخة لعدم وجود حقلي وقت الوصول وبدء العلاج.</p></div>
@@ -80,99 +79,147 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:right;
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
+
 const SUPABASE_URL='https://maiftfuggalykwjipgao.supabase.co';
 const SUPABASE_KEY='sb_publishable_oyavGoxymlZ07pm93ciT4A_HhHcNvWI';
-const KEY='fayed_dental_clinic_v1';
-const EMPTY=()=>({patients:[],appointments:[],payments:[],treatments:[]});
-const TABLES=['patients','appointments','payments','treatments'];
+const TABLES=['patients','appointments','visits','treatments','payments'];
+const EMPTY=()=>({patients:[],appointments:[],visits:[],treatments:[],payments:[]});
 let db=EMPTY(),snap={},sb=null,ver=0,queue=Promise.resolve(),pending=0,reloadTimer=null;
-function setStatus(s){const el=document.getElementById('syncStatus');if(!el)return;el.textContent=({ok:'● متصل ومحفوظ',saving:'… جارٍ الحفظ',err:'⚠ تعذّر الحفظ — تحقق من الإنترنت',load:'… جارٍ التحميل'})[s]||s}
-function persist(){ver++;refresh();pending++;setStatus('saving');queue=queue.then(syncChanges).then(()=>{pending--;if(!pending)setStatus('ok')}).catch(e=>{pending--;console.error(e);setStatus('err');alert('تعذّر حفظ التغييرات على السحابة. تأكد من الإنترنت ثم أعد المحاولة.')})}
-async function syncChanges(){
-  for(const t of TABLES){
-    const cur=new Map(db[t].map(x=>[x.id,JSON.stringify(x)]));
-    const old=snap[t]||new Map();
-    const up=[];for(const [k,v] of cur)if(old.get(k)!==v)up.push({id:k,data:JSON.parse(v),updated_at:new Date().toISOString()});
-    const rm=[...old.keys()].filter(k=>!cur.has(k));
-    for(let i=0;i<up.length;i+=200){const {error}=await sb.from(t).upsert(up.slice(i,i+200));if(error)throw error}
-    for(let i=0;i<rm.length;i+=200){const {error}=await sb.from(t).delete().in('id',rm.slice(i,i+200));if(error)throw error}
-    snap[t]=cur;
-  }
-}
-async function fetchTable(t){let all=[],from=0;for(;;){const {data,error}=await sb.from(t).select('id,data').order('created_at').order('id').range(from,from+999);if(error)throw error;all=all.concat(data);if(data.length<1000)break;from+=1000}return all}
-async function loadAll(){
-  const v=ver;setStatus('load');
-  try{
-    const res=await Promise.all(TABLES.map(fetchTable));
-    if(v!==ver)return;
-    const nd=EMPTY(),ns={};
-    TABLES.forEach((t,i)=>{nd[t]=res[i].map(r=>r.data);ns[t]=new Map(nd[t].map(x=>[x.id,JSON.stringify(x)]))});
-    db=nd;snap=ns;refresh();setStatus('ok');
-  }catch(e){console.error(e);setStatus('err')}
-}
-function scheduleReload(){clearTimeout(reloadTimer);reloadTimer=setTimeout(()=>{queue=queue.then(loadAll)},700)}
-async function startApp(){
-  document.getElementById('loginScreen').classList.add('hidden');
-  await loadAll();
-  // نقل بيانات النسخة المحلية القديمة (مرة واحدة)
-  try{
-    const old=JSON.parse(localStorage.getItem(KEY)||'null');
-    const n=old?TABLES.reduce((s,t)=>s+(old[t]||[]).length,0):0;
-    if(n&&!TABLES.some(t=>db[t].length)&&confirm('وُجدت بيانات قديمة محفوظة على هذا الجهاز ('+n+' سجل). هل تريد رفعها إلى السحابة؟')){
-      db=Object.assign(EMPTY(),old);persist();
-      localStorage.setItem(KEY+'_backup',localStorage.getItem(KEY));localStorage.removeItem(KEY);
-    }
-  }catch(e){}
-  sb.channel('clinic-sync').on('postgres_changes',{event:'*',schema:'public'},scheduleReload).subscribe();
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleReload()});
-}
-async function login(e){
-  e.preventDefault();const msg=document.getElementById('loginMsg'),btn=document.getElementById('l_btn');
-  msg.textContent='';btn.disabled=true;
-  const {error}=await sb.auth.signInWithPassword({email:l_email.value.trim().toLowerCase(),password:l_pass.value.trim()});
-  btn.disabled=false;
-  if(error){msg.textContent=(/invalid login/i.test(error.message)?'البريد أو كلمة السر غير صحيحة':'خطأ: '+error.message);return}
-  l_pass.value='';startApp();
-}
-async function logout(){await sb.auth.signOut();location.reload()}
-async function boot(){
-  const msg=document.getElementById('loginMsg');
-  if(SUPABASE_URL.startsWith('PASTE')||!window.supabase){msg.textContent='لم يتم ربط البرنامج بـ Supabase بعد.';return}
-  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  const {data}=await sb.auth.getSession();
-  if(data.session)startApp();
-}
-function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
-function today(){return new Date().toISOString().slice(0,10)}
+const $=x=>document.getElementById(x);
+function setStatus(s){const el=$('syncStatus');if(!el)return;el.textContent=({ok:'● متصل ومحفوظ',saving:'… جارٍ الحفظ',err:'⚠ تعذّر الحفظ — تحقق من الإنترنت',load:'… جارٍ التحميل'})[s]||s}
+function id(){if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16)})}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function localDate(v){if(!v)return today();const d=new Date(v);if(isNaN(d))return String(v).slice(0,10);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function localTime(v){if(!v)return '';const d=new Date(v);if(isNaN(d))return '';return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function localIso(date,time){return new Date((date||today())+'T'+(time||'12:00')+':00').toISOString()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function money(n){return Number(n||0).toLocaleString('ar-EG',{maximumFractionDigits:2})+' ج.م'}
 function patientName(pid){return db.patients.find(p=>p.id===pid)?.name||'—'}
-function showTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.add('hidden'));document.getElementById(t).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));refresh()}
+function patientTotal(pid){return db.treatments.filter(t=>t.patient===pid).reduce((s,t)=>s+Number(t.cost||0),0)}
+function patientPaid(pid){return db.payments.filter(p=>p.patient===pid).reduce((s,p)=>s+(p.type==='استرداد'?-1:1)*Number(p.amount||0),0)}
+function patientBalance(pid){return patientTotal(pid)-patientPaid(pid)}
+function paymentTypeFromNotes(s){const m=String(s||'').match(/^\[\[TYPE=(دفعة|استرداد)\]\]\s*/);return {type:m?m[1]:'دفعة',note:String(s||'').replace(/^\[\[TYPE=(دفعة|استرداد)\]\]\s*/,'')}}
+function setNotice(s){const el=$('syncStatus');if(el)el.textContent=s}
+function serialRows(t){
+ if(t==='patients')return db.patients.map(p=>({id:p.id,file_number:p.file?Number(p.file):null,full_name:p.name,phone:p.phone||null,age:p.age===''||p.age==null?null:Number(p.age),gender:p.gender||null,address:p.address||null,medical_history:p.medical||null,allergies:p.allergies||null,notes:p.notes||null,created_at:p.created_at||new Date().toISOString(),updated_at:new Date().toISOString()}));
+ if(t==='appointments')return db.appointments.map(a=>({id:a.id,patient_id:a.patient,scheduled_at:localIso(a.date,a.time),status:a.status||'مجدول',reason:a.reason||null,notes:a.notes||null,created_at:a.created_at||new Date().toISOString()}));
+ if(t==='visits')return db.visits.map(v=>({id:v.id,patient_id:v.patient,visit_date:localIso(v.date,'12:00'),chief_complaint:v.chief||null,diagnosis:v.diagnosis||null,examination:v.examination||null,treatment_plan:v.plan||null,notes:v.notes||null,next_visit:v.next_visit||null,created_at:v.created_at||new Date().toISOString()}));
+ if(t==='treatments')return db.treatments.map(t=>({id:t.id,visit_id:t.visit,cost:Number(t.cost||0),treatment_name:t.type,tooth_number:t.tooth||null,description:t.notes||null,created_at:t.created_at||new Date().toISOString()}));
+ if(t==='payments')return db.payments.map(p=>({id:p.id,patient_id:p.patient,visit_id:p.visit||null,amount:Number(p.amount||0),payment_method:p.method||'نقدي',payment_date:localIso(p.date,'12:00'),receipt_number:Number(p.receiptNumber||String(p.receipt||'').replace(/\D/g,'')||Date.now()),notes:'[[TYPE='+ (p.type||'دفعة') +']] '+(p.note||''),created_at:p.created_at||new Date().toISOString()}));
+ return [];
+}
+async function fetchTable(t){let all=[],from=0;for(;;){const {data,error}=await sb.from(t).select('*').range(from,from+999);if(error)throw error;all=all.concat(data||[]);if(!data||data.length<1000)break;from+=1000}return all}
+async function loadAll(){
+ const v=ver;setStatus('load');
+ try{
+  const raw={};for(const t of TABLES)raw[t]=await fetchTable(t);
+  if(v!==ver)return;
+  db=EMPTY();
+  db.patients=raw.patients.map(p=>({id:p.id,name:p.full_name||'',phone:p.phone||'',file:p.file_number==null?'':String(p.file_number),age:p.age==null?'':p.age,gender:p.gender||'',address:p.address||'',medical:p.medical_history||'',allergies:p.allergies||'',notes:p.notes||'',created_at:p.created_at}));
+  db.appointments=raw.appointments.map(a=>({id:a.id,patient:a.patient_id,date:localDate(a.scheduled_at),time:localTime(a.scheduled_at),status:a.status||'مجدول',reason:a.reason||'',notes:a.notes||'',created_at:a.created_at}));
+  db.visits=raw.visits.map(x=>({id:x.id,patient:x.patient_id,date:localDate(x.visit_date),chief:x.chief_complaint||'',diagnosis:x.diagnosis||'',examination:x.examination||'',plan:x.treatment_plan||'',notes:x.notes||'',next_visit:x.next_visit||'',created_at:x.created_at}));
+  const vm=new Map(db.visits.map(x=>[x.id,x]));
+  db.treatments=raw.treatments.map(t=>{const v=vm.get(t.visit_id)||{};return {id:t.id,visit:t.visit_id,patient:v.patient||'',date:v.date||localDate(t.created_at),type:t.treatment_name||'',tooth:t.tooth_number||'',notes:t.description||'',cost:Number(t.cost||0),created_at:t.created_at}});
+  db.payments=raw.payments.map(p=>{const m=paymentTypeFromNotes(p.notes);return {id:p.id,patient:p.patient_id,visit:p.visit_id||'',date:localDate(p.payment_date),amount:Number(p.amount||0),type:m.type,note:m.note,method:p.payment_method||'نقدي',receiptNumber:p.receipt_number,receipt:'FDC-'+String(p.receipt_number||''),created_at:p.created_at}});
+  snap={};for(const t of TABLES)snap[t]=new Map(raw[t].map(x=>[x.id,JSON.stringify(x)]));
+  refresh();setStatus('ok');
+ }catch(e){console.error(e);setStatus('err');if(!db.patients.length&&!db.appointments.length&&!db.payments.length)alert('تعذر تحميل البيانات من قاعدة البيانات. راجع صلاحيات الجداول والاتصال.') }
+}
+async function syncChanges(){
+ const upOrder=['patients','appointments','visits','payments','treatments'];
+ for(const t of upOrder){
+  const rows=serialRows(t),old=snap[t]||new Map(),up=rows.filter(x=>old.get(x.id)!==JSON.stringify(x));
+  for(let i=0;i<up.length;i+=100){const {error}=await sb.from(t).upsert(up.slice(i,i+100));if(error)throw error}
+  const next=new Map(rows.map(x=>[x.id,JSON.stringify(x)]));snap[t]=next;
+ }
+ const delOrder=['treatments','payments','appointments','visits','patients'];
+ for(const t of delOrder){
+  const cur=new Set(db[t].map(x=>x.id)),old=snap[t]||new Map(),rm=[...old.keys()].filter(k=>!cur.has(k));
+  for(let i=0;i<rm.length;i+=100){const {error}=await sb.from(t).delete().in('id',rm.slice(i,i+100));if(error)throw error}
+  const rows=serialRows(t);snap[t]=new Map(rows.map(x=>[x.id,JSON.stringify(x)]));
+ }
+}
+function persist(){
+ ver++;refresh();pending++;setStatus('saving');
+ queue=queue.then(syncChanges).then(()=>{pending--;if(!pending)setStatus('ok')}).catch(e=>{pending--;console.error(e);setStatus('err');alert('تعذّر حفظ التغييرات على السحابة: '+(e.message||'تحقق من الاتصال وصلاحيات قاعدة البيانات'))});
+}
+function scheduleReload(){clearTimeout(reloadTimer);reloadTimer=setTimeout(()=>{if(!pending)queue=queue.then(loadAll)},800)}
+async function startApp(){
+ $('loginScreen').classList.add('hidden');await loadAll();
+ sb.channel('clinic-sync').on('postgres_changes',{event:'*',schema:'public'},scheduleReload).subscribe();
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleReload()});
+}
+async function login(e){e.preventDefault();const msg=$('loginMsg'),btn=$('l_btn');msg.textContent='';btn.disabled=true;const {error}=await sb.auth.signInWithPassword({email:$('l_email').value.trim().toLowerCase(),password:$('l_pass').value});btn.disabled=false;if(error){msg.textContent=(/invalid login/i.test(error.message)?'البريد أو كلمة السر غير صحيحة':'خطأ: '+error.message);return}$('l_pass').value='';startApp()}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function boot(){const msg=$('loginMsg');if(!window.supabase){msg.textContent='تعذر تحميل مكتبة الاتصال. تحقق من الإنترنت.';return}sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const {data,error}=await sb.auth.getSession();if(error){msg.textContent=error.message;return}if(data.session)startApp()}
+function showTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.add('hidden'));$(t).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));refresh()}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-function options(id,all=true){let el=document.getElementById(id),old=el.value;el.innerHTML=(all?'<option value="">كل المرضى</option>':'<option value="">اختر المريض</option>')+db.patients.map(p=>`<option value="${p.id}">${esc(p.name)} — ${esc(p.file||'')}</option>`).join('');if([...el.options].some(o=>o.value===old))el.value=old}
+function options(id,all=true){const el=$(id),old=el.value;el.innerHTML=(all?'<option value="">كل المرضى</option>':'<option value="">اختر المريض</option>')+db.patients.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+' — '+esc(p.file||'')+'</option>').join('');if([...el.options].some(o=>o.value===old))el.value=old}
 function refresh(){['a_patient','pay_patient','t_patient'].forEach(x=>options(x,false));options('t_filter',true);renderHome();renderPatients();renderAppointments();renderPayments();renderTreatments();renderReports()}
-function renderHome(){let d=today(),aps=db.appointments.filter(a=>a.date===d),present=aps.filter(a=>['حضر','تم'].includes(a.status)).length;document.getElementById('homeStats').innerHTML=[['إجمالي المرضى',db.patients.length],['مواعيد اليوم',aps.length],['حضروا اليوم',present],['إجمالي المدفوعات',money(db.payments.reduce((s,p)=>s+(p.type==='استرداد'?-1:1)*Number(p.amount),0))]].map(x=>`<div class="stat"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}
-function clearPatient(){['p_id','p_name','p_phone','p_file','p_birth','p_notes'].forEach(x=>document.getElementById(x).value='')}
-function savePatient(){let name=p_name.value.trim();if(!name)return alert('اكتب اسم المريض');let obj={id:p_id.value||id(),name,phone:p_phone.value,file:p_file.value||('FDC-'+String(db.patients.length+1).padStart(4,'0')),birth:p_birth.value,notes:p_notes.value};let i=db.patients.findIndex(p=>p.id===obj.id);if(i>=0)db.patients[i]=obj;else db.patients.push(obj);clearPatient();persist()}
-function renderPatients(){let q=(patientSearch.value||'').toLowerCase();let arr=db.patients.filter(p=>[p.name,p.phone,p.file].join(' ').toLowerCase().includes(q));patientsRows.innerHTML=arr.map(p=>`<tr><td>${esc(p.file)}</td><td>${esc(p.name)}</td><td>${esc(p.phone)}</td><td><button class="btn light" onclick="editPatient('${p.id}')">تعديل</button> <button class="btn danger" onclick="del('patients','${p.id}')">حذف</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">لا توجد بيانات مرضى</td></tr>'}
-function editPatient(pid){let p=db.patients.find(x=>x.id===pid);if(!p)return;p_id.value=p.id;p_name.value=p.name;p_phone.value=p.phone;p_file.value=p.file;p_birth.value=p.birth;p_notes.value=p.notes;showTab('patients');window.scrollTo(0,0)}
-function clearAppointment(){['a_id','a_patient','a_date','a_time','a_reason'].forEach(x=>document.getElementById(x).value='');a_status.value='مجدول'}
-function saveAppointment(){if(!a_patient.value)return alert('اختر المريض');let obj={id:a_id.value||id(),patient:a_patient.value,date:a_date.value||today(),time:a_time.value,status:a_status.value,reason:a_reason.value};let i=db.appointments.findIndex(a=>a.id===obj.id);if(i>=0)db.appointments[i]=obj;else db.appointments.push(obj);clearAppointment();persist()}
-function renderAppointments(){let d=appointmentDate.value||today();if(!appointmentDate.value)appointmentDate.value=d;let arr=db.appointments.filter(a=>a.date===d).sort((a,b)=>(a.time||'').localeCompare(b.time||''));appointmentsRows.innerHTML=arr.map(a=>`<tr><td>${esc(a.time||'—')}</td><td>${esc(patientName(a.patient))}</td><td><select onchange="setStatus('${a.id}',this.value)">${['مجدول','حضر','متأخر','لم يحضر','تم','ملغي'].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select></td><td>${esc(a.reason)}</td><td><button class="btn light" onclick="editAppointment('${a.id}')">تعديل</button> <button class="btn danger" onclick="del('appointments','${a.id}')">حذف</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">لا توجد مواعيد في هذا اليوم</td></tr>'}
-function setStatus(pid,s){let a=db.appointments.find(x=>x.id===pid);if(a){a.status=s;persist()}}
-function editAppointment(pid){let a=db.appointments.find(x=>x.id===pid);if(!a)return;a_id.value=a.id;a_patient.value=a.patient;a_date.value=a.date;a_time.value=a.time;a_status.value=a.status;a_reason.value=a.reason;window.scrollTo(0,0)}
-function savePayment(){if(!pay_patient.value)return alert('اختر المريض');let amount=Number(pay_amount.value);if(!(amount>0))return alert('أدخل مبلغًا صحيحًا');let p={id:id(),receipt:'FDC-'+Date.now().toString().slice(-7),patient:pay_patient.value,date:pay_date.value||today(),amount,type:pay_type.value,note:pay_note.value};db.payments.push(p);persist();printReceipt(p)}
-function printReceipt(p){let w=window.open('','_blank');if(!w)return alert('اسمح بفتح النوافذ المنبثقة لطباعة الإيصال');w.document.write(`<html lang="ar" dir="rtl"><meta charset="utf-8"><title>إيصال ${p.receipt}</title><body style="font-family:Tahoma,Arial;padding:30px;max-width:650px;margin:auto"><h2 style="text-align:center">Fayed Dental Clinic</h2><h3 style="text-align:center">إيصال استلام</h3><hr><p>رقم الإيصال: ${esc(p.receipt)}</p><p>التاريخ: ${esc(p.date)}</p><p>اسم المريض: ${esc(patientName(p.patient))}</p><p>البيان: ${esc(p.note)}</p><h2>المبلغ: ${money(p.amount)}</h2><p>نوع العملية: ${esc(p.type)}</p><br><p>التوقيع: __________________</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
-function renderPayments(){paymentsRows.innerHTML=db.payments.slice().reverse().map(p=>`<tr><td>${esc(p.receipt)}</td><td>${esc(p.date)}</td><td>${esc(patientName(p.patient))}</td><td>${esc(p.note)}</td><td>${money(p.amount)}</td><td><button class="btn light" onclick="printReceipt(db.payments.find(x=>x.id==='${p.id}'))">طباعة</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">لا توجد مدفوعات</td></tr>'}
-function saveTreatment(){if(!t_patient.value)return alert('اختر المريض');if(!t_type.value.trim())return alert('اكتب نوع العلاج');db.treatments.push({id:id(),patient:t_patient.value,date:t_date.value||today(),type:t_type.value,tooth:t_tooth.value,notes:t_notes.value});['t_type','t_tooth','t_notes'].forEach(x=>document.getElementById(x).value='');persist()}
-function renderTreatments(){let year=t_year.value||String(new Date().getFullYear());let years=[...new Set([String(new Date().getFullYear()),...db.treatments.map(t=>t.date.slice(0,4))])].sort().reverse();t_year.innerHTML=years.map(y=>`<option ${y===year?'selected':''}>${y}</option>`).join('');let arr=db.treatments.filter(t=>(!t_filter.value||t.patient===t_filter.value)&&t.date.startsWith(year)).sort((a,b)=>b.date.localeCompare(a.date));treatmentsRows.innerHTML=arr.map(t=>`<tr><td>${esc(t.date)}</td><td>${esc(patientName(t.patient))}</td><td>${esc(t.type)}</td><td>${esc(t.tooth)}</td><td>${esc(t.notes)}</td><td><button class="btn danger" onclick="del('treatments','${t.id}')">حذف</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">لا توجد علاجات في هذه السنة</td></tr>'}
-function renderReports(){let d=reportDate.value||today();if(!reportDate.value)reportDate.value=d;let day=db.appointments.filter(a=>a.date===d),pres=day.filter(a=>['حضر','تم'].includes(a.status)).length,late=day.filter(a=>a.status==='متأخر').length,miss=day.filter(a=>a.status==='لم يحضر').length,rev=db.payments.filter(p=>p.date===d).reduce((s,p)=>s+(p.type==='استرداد'?-1:1)*p.amount,0);reportStats.innerHTML=[['المواعيد',day.length],['الحضور',pres],['متأخرون',late],['لم يحضروا',miss],['إيراد اليوم',money(rev)]].map(x=>`<div class="stat"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');let hrs={};day.forEach(a=>{let h=(a.time||'غير محدد').slice(0,2);hrs[h]=(hrs[h]||0)+1});hourReport.innerHTML=Object.keys(hrs).sort().map(h=>`<div style="margin:8px 0"><div class="row"><span>${h==='غير محدد'?h:h+':00'}</span><b>${hrs[h]} موعد</b></div><div style="height:9px;background:#e8f0ee;border-radius:9px;overflow:hidden"><div style="height:9px;width:${Math.min(100,hrs[h]/Math.max(1,...Object.values(hrs))*100)}%;background:#0f766e"></div></div></div>`).join('')||'<p class="empty">لا توجد مواعيد لهذا اليوم</p>';let base=new Date(d+'T12:00:00');let days=[];for(let i=6;i>=0;i--){let dt=new Date(base);dt.setDate(dt.getDate()-i);let s=dt.toISOString().slice(0,10),a=db.appointments.filter(x=>x.date===s);days.push(`<tr><td>${s}</td><td>${a.length}</td><td>${a.filter(x=>['حضر','تم'].includes(x.status)).length}</td><td>${a.filter(x=>x.status==='لم يحضر').length}</td></tr>`)}weeklyRows.innerHTML=days.join('')}
-function del(table,pid){if(!confirm('هل تريد حذف هذا السجل؟'))return;db[table]=db[table].filter(x=>x.id!==pid);persist()}
-function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Fayed-Dental-Clinic-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url)}
-function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.patients||!x.appointments||!x.payments||!x.treatments)throw 0;if(!confirm('سيتم استبدال البيانات الحالية. هل تريد المتابعة؟'))return;db=x;persist();alert('تمت استعادة البيانات')}catch(err){alert('ملف النسخة الاحتياطية غير صالح')}};r.readAsText(f)}
+function renderHome(){const d=today(),aps=db.appointments.filter(a=>a.date===d),pres=aps.filter(a=>['حضر','تم'].includes(a.status)).length,total=db.patients.reduce((s,p)=>s+patientTotal(p.id),0),paid=db.patients.reduce((s,p)=>s+patientPaid(p.id),0);$('homeStats').innerHTML=[['إجمالي المرضى',db.patients.length],['مواعيد اليوم',aps.length],['حضروا اليوم',pres],['إجمالي تكلفة العلاج',money(total)],['إجمالي المدفوع',money(paid)],['إجمالي المتبقي',money(total-paid)]].map(x=>'<div class="stat"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')}
+function clearPatient(){['p_id','p_name','p_phone','p_file','p_age','p_address','p_medical','p_allergies','p_notes'].forEach(x=>$(x).value='');$('p_gender').value=''}
+function savePatient(){
+ const name=$('p_name').value.trim();if(!name)return alert('اكتب اسم المريض');
+ const nextFile=String(Math.max(1000,...db.patients.map(p=>Number(p.file)||0))+1);
+ const obj={id:$('p_id').value||id(),name,phone:$('p_phone').value.trim(),file:$('p_file').value.trim()||nextFile,age:$('p_age').value,gender:$('p_gender').value,address:$('p_address').value,medical:$('p_medical').value,allergies:$('p_allergies').value,notes:$('p_notes').value,created_at:db.patients.find(p=>p.id===$('p_id').value)?.created_at||new Date().toISOString()};
+ const i=db.patients.findIndex(p=>p.id===obj.id);if(i>=0)db.patients[i]=obj;else db.patients.push(obj);clearPatient();persist()
+}
+function renderPatients(){
+ const q=($('patientSearch').value||'').toLowerCase();
+ const arr=db.patients.filter(p=>[p.name,p.phone,p.file].join(' ').toLowerCase().includes(q));
+ $('patientsRows').innerHTML=arr.map(p=>'<tr><td>'+esc(p.file)+'</td><td>'+esc(p.name)+'</td><td>'+esc(p.phone)+'</td><td>'+money(patientTotal(p.id))+'</td><td>'+money(patientPaid(p.id))+'</td><td><b>'+money(patientBalance(p.id))+'</b></td><td><button class="btn light" onclick="editPatient(\''+p.id+'\')">تعديل</button> <button class="btn danger" onclick="del(\'patients\',\''+p.id+'\')">حذف</button></td></tr>').join('')||'<tr><td colspan="7" class="empty">لا توجد بيانات مرضى</td></tr>'
+}
+function editPatient(pid){const p=db.patients.find(x=>x.id===pid);if(!p)return;$('p_id').value=p.id;$('p_name').value=p.name;$('p_phone').value=p.phone;$('p_file').value=p.file;$('p_age').value=p.age;$('p_gender').value=p.gender;$('p_address').value=p.address;$('p_medical').value=p.medical;$('p_allergies').value=p.allergies;$('p_notes').value=p.notes;showTab('patients');window.scrollTo(0,0)}
+function clearAppointment(){['a_id','a_patient','a_date','a_time','a_reason'].forEach(x=>$(x).value='');$('a_status').value='مجدول'}
+function saveAppointment(){if(!$('a_patient').value)return alert('اختر المريض');const obj={id:$('a_id').value||id(),patient:$('a_patient').value,date:$('a_date').value||today(),time:$('a_time').value,status:$('a_status').value,reason:$('a_reason').value,created_at:db.appointments.find(a=>a.id===$('a_id').value)?.created_at||new Date().toISOString()};const i=db.appointments.findIndex(a=>a.id===obj.id);if(i>=0)db.appointments[i]=obj;else db.appointments.push(obj);clearAppointment();persist()}
+function renderAppointments(){const d=$('appointmentDate').value||today();if(!$('appointmentDate').value)$('appointmentDate').value=d;const arr=db.appointments.filter(a=>a.date===d).sort((a,b)=>(a.time||'').localeCompare(b.time||''));$('appointmentsRows').innerHTML=arr.map(a=>'<tr><td>'+esc(a.time||'—')+'</td><td>'+esc(patientName(a.patient))+'</td><td><select onchange="setStatus(\''+a.id+'\',this.value)">'+['مجدول','حضر','متأخر','لم يحضر','تم','ملغي'].map(s=>'<option '+(a.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></td><td>'+esc(a.reason)+'</td><td><button class="btn light" onclick="editAppointment(\''+a.id+'\')">تعديل</button> <button class="btn danger" onclick="del(\'appointments\',\''+a.id+'\')">حذف</button></td></tr>').join('')||'<tr><td colspan="5" class="empty">لا توجد مواعيد في هذا اليوم</td></tr>'}
+function setStatus(pid,s){const a=db.appointments.find(x=>x.id===pid);if(a){a.status=s;persist()}}
+function editAppointment(pid){const a=db.appointments.find(x=>x.id===pid);if(!a)return;$('a_id').value=a.id;$('a_patient').value=a.patient;$('a_date').value=a.date;$('a_time').value=a.time;$('a_status').value=a.status;$('a_reason').value=a.reason;showTab('appointments');window.scrollTo(0,0)}
+function savePayment(){
+ if(!$('pay_patient').value)return alert('اختر المريض');const amount=Number($('pay_amount').value);if(!(amount>0))return alert('أدخل مبلغًا صحيحًا');
+ const receiptNumber=Date.now();const p={id:id(),receiptNumber,receipt:'FDC-'+receiptNumber,patient:$('pay_patient').value,date:$('pay_date').value||today(),amount,type:$('pay_type').value,method:$('pay_method').value,note:$('pay_note').value,created_at:new Date().toISOString()};
+ db.payments.push(p);persist();printReceipt(p);$('pay_amount').value='';$('pay_note').value=''
+}
+function printReceipt(p){
+ const total=patientTotal(p.patient),paid=patientPaid(p.patient),balance=patientBalance(p.patient),w=window.open('','_blank');if(!w)return alert('اسمح بفتح النوافذ المنبثقة لطباعة الإيصال');
+ w.document.write('<html lang="ar" dir="rtl"><meta charset="utf-8"><title>إيصال '+esc(p.receipt)+'</title><body style="font-family:Tahoma,Arial;padding:30px;max-width:650px;margin:auto"><h2 style="text-align:center">Fayed Dental Clinic</h2><h3 style="text-align:center">إيصال استلام</h3><hr><p>رقم الإيصال: '+esc(p.receipt)+'</p><p>التاريخ: '+esc(p.date)+'</p><p>اسم المريض: '+esc(patientName(p.patient))+'</p><p>البيان: '+esc(p.note)+'</p><p>طريقة الدفع: '+esc(p.method)+'</p><h2>المبلغ '+(p.type==='استرداد'?'المسترد':'المدفوع')+': '+money(p.amount)+'</h2><hr><p>إجمالي تكلفة العلاج: '+money(total)+'</p><p>إجمالي المدفوع بعد العملية: '+money(paid)+'</p><h2>المتبقي: '+money(balance)+'</h2><br><p>التوقيع: __________________</p><script>window.onload=()=>window.print()<\\/script></body></html>');w.document.close()
+}
+function renderPayments(){$('paymentsRows').innerHTML=db.payments.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(p=>'<tr><td>'+esc(p.receipt)+'</td><td>'+esc(p.date)+'</td><td>'+esc(patientName(p.patient))+'</td><td>'+esc(p.note)+'</td><td>'+esc(p.type==='استرداد'?'استرداد':'دفعة')+'</td><td>'+money(p.amount)+'</td><td>'+money(patientBalance(p.patient))+'</td><td><button class="btn light" onclick="printReceipt(db.payments.find(x=>x.id===\''+p.id+'\'))">طباعة</button></td></tr>').join('')||'<tr><td colspan="8" class="empty">لا توجد مدفوعات</td></tr>'}
+function saveTreatment(){
+ if(!$('t_patient').value)return alert('اختر المريض');if(!$('t_type').value.trim())return alert('اكتب نوع العلاج');const cost=Number($('t_cost').value||0);if(cost<0)return alert('التكلفة لا يمكن أن تكون سالبة');
+ const visitId=id(),date=$('t_date').value||today(),patient=$('t_patient').value,type=$('t_type').value.trim(),notes=$('t_notes').value;
+ db.visits.push({id:visitId,patient,date,chief:'',diagnosis:'',examination:'',plan:type,notes,created_at:new Date().toISOString()});
+ db.treatments.push({id:id(),visit:visitId,patient,date,type,tooth:$('t_tooth').value,notes,cost,created_at:new Date().toISOString()});
+ ['t_type','t_tooth','t_notes','t_cost'].forEach(x=>$(x).value='');persist()
+}
+function renderTreatments(){
+ const year=$('t_year').value||String(new Date().getFullYear()),years=[...new Set([String(new Date().getFullYear()),...db.treatments.map(t=>String(t.date).slice(0,4))])].sort().reverse();
+ $('t_year').innerHTML=years.map(y=>'<option '+(y===year?'selected':'')+'>'+y+'</option>').join('');
+ const arr=db.treatments.filter(t=>(!$('t_filter').value||t.patient===$('t_filter').value)&&String(t.date).startsWith(year)).sort((a,b)=>b.date.localeCompare(a.date));
+ $('treatmentsRows').innerHTML=arr.map(t=>'<tr><td>'+esc(t.date)+'</td><td>'+esc(patientName(t.patient))+'</td><td>'+esc(t.type)+'</td><td>'+esc(t.tooth)+'</td><td>'+money(t.cost)+'</td><td>'+esc(t.notes)+'</td><td><button class="btn danger" onclick="del(\'treatments\',\''+t.id+'\')">حذف</button></td></tr>').join('')||'<tr><td colspan="7" class="empty">لا توجد علاجات في هذه السنة</td></tr>'
+}
+function renderReports(){
+ const d=$('reportDate').value||today();if(!$('reportDate').value)$('reportDate').value=d;
+ const day=db.appointments.filter(a=>a.date===d),pres=day.filter(a=>['حضر','تم'].includes(a.status)).length,late=day.filter(a=>a.status==='متأخر').length,miss=day.filter(a=>a.status==='لم يحضر').length,rev=db.payments.filter(p=>p.date===d).reduce((s,p)=>s+(p.type==='استرداد'?-1:1)*p.amount,0),total=db.patients.reduce((s,p)=>s+patientTotal(p.id),0),paid=db.patients.reduce((s,p)=>s+patientPaid(p.id),0);
+ $('reportStats').innerHTML=[['المواعيد',day.length],['الحضور',pres],['متأخرون',late],['لم يحضروا',miss],['إيراد اليوم',money(rev)],['إجمالي تكلفة العلاجات',money(total)],['إجمالي المدفوع',money(paid)],['الديون المتبقية',money(total-paid)]].map(x=>'<div class="stat"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('');
+ const hrs={};day.forEach(a=>{const h=(a.time||'غير محدد').slice(0,2);hrs[h]=(hrs[h]||0)+1});
+ $('hourReport').innerHTML=Object.keys(hrs).sort().map(h=>'<div style="margin:8px 0"><div class="row"><span>'+ (h==='غير محدد'?h:h+':00')+'</span><b>'+hrs[h]+' موعد</b></div><div style="height:9px;background:#e8f0ee;border-radius:9px;overflow:hidden"><div style="height:9px;width:'+Math.min(100,hrs[h]/Math.max(1,...Object.values(hrs))*100)+'%;background:#0f766e"></div></div></div>').join('')||'<p class="empty">لا توجد مواعيد لهذا اليوم</p>';
+ const base=new Date(d+'T12:00:00'),days=[];for(let i=6;i>=0;i--){const dt=new Date(base);dt.setDate(dt.getDate()-i);const s=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'),a=db.appointments.filter(x=>x.date===s);days.push('<tr><td>'+s+'</td><td>'+a.length+'</td><td>'+a.filter(x=>['حضر','تم'].includes(x.status)).length+'</td><td>'+a.filter(x=>x.status==='لم يحضر').length+'</td></tr>')}
+ $('weeklyRows').innerHTML=days.join('')
+}
+function del(table,pid){
+ if(!confirm('هل تريد حذف هذا السجل؟'))return;
+ if(table==='patients'){const visitIds=db.visits.filter(v=>v.patient===pid).map(v=>v.id);db.treatments=db.treatments.filter(t=>!visitIds.includes(t.visit));db.visits=db.visits.filter(v=>v.patient!==pid);db.appointments=db.appointments.filter(a=>a.patient!==pid);db.payments=db.payments.filter(p=>p.patient!==pid)}
+ else if(table==='treatments'){const t=db.treatments.find(x=>x.id===pid);db.treatments=db.treatments.filter(x=>x.id!==pid);if(t&&!db.treatments.some(x=>x.visit===t.visit))db.visits=db.visits.filter(v=>v.id!==t.visit)}
+ else db[table]=db[table].filter(x=>x.id!==pid);
+ persist()
+}
+function exportData(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Fayed-Dental-Clinic-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url)}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.patients||!x.appointments||!x.payments||!x.treatments)throw 0;if(!confirm('سيتم استبدال البيانات الحالية. هل تريد المتابعة؟'))return;db={patients:x.patients,appointments:x.appointments,visits:x.visits||[],payments:x.payments,treatments:x.treatments};persist();alert('تم بدء استعادة البيانات إلى السحابة')}catch(err){alert('ملف النسخة الاحتياطية غير صالح')}};r.readAsText(f)}
 function clearAll(){if(prompt('تحذير: سيتم حذف جميع بيانات المرضى والمواعيد والمدفوعات والعلاجات نهائيًا من السحابة ومن كل الأجهزة.\nللتأكيد اكتب كلمة: حذف')==='حذف'){db=EMPTY();persist()}}
-['a_date','pay_date','t_date','reportDate','appointmentDate'].forEach(x=>{let el=document.getElementById(x);if(el)el.value=today()});
+['a_date','pay_date','t_date','reportDate','appointmentDate'].forEach(x=>{if($(x))$(x).value=today()});
 refresh();
 boot();
+
 </script>
 </body></html>
