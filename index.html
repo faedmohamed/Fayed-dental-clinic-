@@ -126,18 +126,18 @@ async function loadAll(){
  }catch(e){console.error(e);setStatus('err');if(!db.patients.length&&!db.appointments.length&&!db.payments.length)alert('تعذر تحميل البيانات من قاعدة البيانات. راجع صلاحيات الجداول والاتصال.') }
 }
 async function syncChanges(){
+ const original={};for(const t of TABLES)original[t]=snap[t]||new Map();
  const upOrder=['patients','appointments','visits','payments','treatments'];
  for(const t of upOrder){
-  const rows=serialRows(t),old=snap[t]||new Map(),up=rows.filter(x=>old.get(x.id)!==JSON.stringify(x));
+  const rows=serialRows(t),old=original[t],up=rows.filter(x=>old.get(x.id)!==JSON.stringify(x));
   for(let i=0;i<up.length;i+=100){const {error}=await sb.from(t).upsert(up.slice(i,i+100));if(error)throw error}
-  const next=new Map(rows.map(x=>[x.id,JSON.stringify(x)]));snap[t]=next;
  }
  const delOrder=['treatments','payments','appointments','visits','patients'];
  for(const t of delOrder){
-  const cur=new Set(db[t].map(x=>x.id)),old=snap[t]||new Map(),rm=[...old.keys()].filter(k=>!cur.has(k));
+  const cur=new Set(db[t].map(x=>x.id)),old=original[t],rm=[...old.keys()].filter(k=>!cur.has(k));
   for(let i=0;i<rm.length;i+=100){const {error}=await sb.from(t).delete().in('id',rm.slice(i,i+100));if(error)throw error}
-  const rows=serialRows(t);snap[t]=new Map(rows.map(x=>[x.id,JSON.stringify(x)]));
  }
+ for(const t of TABLES){const rows=serialRows(t);snap[t]=new Map(rows.map(x=>[x.id,JSON.stringify(x)]))}
 }
 function persist(){
  ver++;refresh();pending++;setStatus('saving');
